@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+<style type="text/css">
+	.forma input{
+		width: 30%;
+	}
+</style>
+<div class="card" style="width: 70%; padding: 20px;">
+	    <h5 class="card-title">Add something new..</h5>
+<form action="{% url 'posts:addpost' %}" class="forma" method="POST" enctype="multipart/form-data" >
+	{% csrf_token %}
+	{{ p_form|crispy}}
+	<p></p>
+		<button type="submit" class="btn btn-success mb-2">post</button>
+</form>
+</div>
+<br>
+{% include "../post/post_list.html"  with posts=posts user=user c_form=c_form  %}
+
+{% endblock body %}

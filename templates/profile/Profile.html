@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+	{{f_profile}}
+{% endblock title %}
+
+{% block body %}
+
+<div class="container">
+    <div class="main-body">
+    
+          <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex flex-column align-items-center text-center">
+                    <img src="{{ f_profile.avatar.url }}" alt="avatar" class="rounded-circle image-display" width="150">
+                    <div class="mt-3">
+                      <h4>{{f_profile.first_name}} {{f_profile.last_name}}</h4>
+                      <!--<p class="text-secondary mb-1">Full Stack Developer</p>
+                      <p class="text-muted font-size-sm">Bay Area, San Francisco, CA</p>-->
+                      {% if not status %}
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                         Edit
+                        </button>
+
+                      {% elif status == "accepted" %}     
+                        <form action="{% url 'profiles:remove_friend' %}" method="POST">
+                          {% csrf_token %}
+                          <input type="hidden" name="next" value="{{f_profile.slug}}">
+                          <input type="hidden" name="friend_id" value={{f_profile.pk}}>
+                          <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                      {% elif  status == "pending"%}
+                        <form action="{% url 'profiles:remove_friend' %}" method="POST">
+                          {% csrf_token %}
+                          <input type="hidden" name="next" value="{{f_profile.slug}}">
+                          <input type="hidden" name="friend_id" value={{f_profile.pk}}>
+                          <p>Wating for apporaval</p>
+                          <button type="submit" class="btn btn-secondary">Withdraw</button>
+                        </form>
+                      {% elif  status == "wating"%}
+                        <div class="row"> 
+                          <div class="col-sm-6">
+                            <form action="{% url 'profiles:confirm_friend' %}" method="POST">
+                              {% csrf_token %}
+                              <input type="hidden" name="next" value="{{f_profile.slug}}">
+                              <input type="hidden" name="friend_id" value={{f_profile.pk}}>
+                              <button type="submit" class="btn btn-success">Confirm</button>
+                            </form>
+                          </div>
+                          <div class="col-sm-6"> 
+                            <form action="{% url 'profiles:remove_friend' %}" method="POST">
+                              {% csrf_token %}
+                              <input type="hidden" name="next" value="{{f_profile.slug}}">
+                              <input type="hidden" name="friend_id" value={{f_profile.pk}}>
+                              <button type="submit" class="btn btn-danger">Decline</button>
+                            </form>
+                          </div>
+                        </div>
+                      {% else %}
+                       <form action="{% url 'profiles:add_friend' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value={{f_profile.pk}}>
+                            <input type="hidden" name="next" value="{{f_profile.slug}}">
+                            <button type="submit" class="btn btn-primary">Add friend</button>
+                        </form>
+                      {% endif %}
+                      <!--<button class="btn btn-primary">Follow</button>
+                      <button class="btn btn-outline-primary">Message</button>-->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="col-md-8">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Full Name</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{f_profile.first_name}} {{f_profile.last_name}}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Bio</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{f_profile.bio}}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Friends</h6>
+                    </div>
+                    <div class="col-sm-3 text-secondary">
+                      {{f_profile.get_friends_count}}
+                    </div>
+                    <div style="border-left:1px solid #000;"></div>
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Posts</h6>
+                    </div>
+                    <div class="col-sm-2 text-secondary">
+                      {{post_count }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% if not u_profile %}
+              {% endif %}
+			</div>
+
+		</div>
+    </div>
+<hr>
+
+
+<div class="align-self-center">
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Update Profile</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="d-flex justify-content-center">
+      <img src="{{ f_profile.avatar.url }}" alt="avatar" class="rounded-circle image-display modal-image-show" width="150">
+      </div>
+      <form action="{% url 'profiles:profile_view' slug=profile.slug %}" method="POST" enctype="multipart/form-data">
+      <div class="modal-body custom">
+        {% csrf_token %}
+        {{u_form| crispy}}
+        <input type="hidden" name="id" value="{{profile.id}}">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+<style type="text/css">
+  .custom input[type='file']{
+    display: none;
+  }
+  .image-display{
+     height: 157px; 
+     width: 150px;
+  }
+  #div_id_avatar label{
+    color: red;
+    cursor: pointer;
+    text-align: center;
+    margin: auto;
+    display: table;
+    padding: 10px;
+  }
+</style>
+
+{% include "../post/post_list.html"  with posts=posts c_form=c_form %}
+</div>
+{% endblock body %}
+
+
+
+{% block scripts %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#id_avatar').change(function(event){
+      var x = URL.createObjectURL(event.target.files[0]);
+      console.log(x)
+      $('.modal-image-show').attr("src",x);
+
+    });
+  });
+</script>
+{% endblock scripts %}
+
+<input type="file" name="avatar" accept="image/*" class="fileinput fileUpload" id="id_avatar">

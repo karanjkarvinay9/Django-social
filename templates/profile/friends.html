@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+{% if friends_pending %}
+
+<h3>Pending Requests</h3>
+	<hr>
+	{% for friend in friends_pending %}
+		<div class="card" style="width: 60%;">
+			<div class="row">
+				<div class="col-sm-3">
+					<a href="{% url 'profiles:profile_view' slug=friend.slug %}">
+						<img class="card-img-top rounded-circle" 
+						src="{{friend.avatar.url}}" alt="Card image cap"></a>
+				</div>
+				<div class="col-sm-9">
+					<div class="card-body">
+						<a href="{% url 'profiles:profile_view' slug=friend.slug %}">
+					    <h5 class="card-title">{{friend}}</h5></a>
+					    <p class="card-text">Sent you a friend request</p>
+					    <div class="row"> 
+					    	<div class="col-sm-3">
+					    	<form action="{% url 'profiles:confirm_friend' %}" method="POST">
+	                            {% csrf_token %}
+	                            <input type="hidden" name="next" value="list">
+	                            <input type="hidden" name="friend_id" value={{friend.pk}}>
+	                            <button type="submit" class="btn btn-success">Confirm</button>
+	                        </form>
+						    </div>
+						    <div class="col-sm-3"> 
+							    <form action="{% url 'profiles:remove_friend' %}" method="POST">
+		                            {% csrf_token %}
+		                            <input type="hidden" name="next" value="list">
+		                            <input type="hidden" name="friend_id" value={{friend.pk}}>
+		                            <button type="submit" class="btn btn-danger">Decline</button>
+		                        </form>
+	                        </div>
+						</div>
+					  </div>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+	
+{% endif %}
+	
+	
+	<br>
+	{% if friends %}
+	<h3>Friends</h3>
+	<hr>
+	{% for friend in friends %}
+		<div class="card" style="width: 60%;">
+			<div class="row">
+				<div class="col-sm-3">
+					<a href="{% url 'profiles:profile_view' slug=friend.slug %}">
+						<img class="card-img-top rounded-circle" 
+						src="{{friend.avatar.url}}" alt="Card image cap"></a>
+				</div>
+				<div class="col-sm-9">
+					<div class="card-body">
+						<a href="{% url 'profiles:profile_view' slug=friend.slug %}">
+					    <h5 class="card-title">{{friend}}</h5></a>
+					    <p class="card-text"></p>
+					    <form action="{% url 'profiles:remove_friend' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="list">
+                            <input type="hidden" name="friend_id" value={{friend.pk}}>
+                            <button type="submit" class="btn btn-danger"><i class="minus square icon">Remove</button>
+                        </form>
+					  </div>
+				</div>
+			</div>
+		</div>
+	{% endfor %}	
+	{% endif %}
+
+	{% if  not friends %}
+	{% if not friends_pending%}
+		<h3>Connect with new people..</h3>
+		<hr>
+		{% for profile in all_profile %}
+		<div class="card" style="width: 60%;">
+			<div class="row">
+				<div class="col-sm-3">
+					<a href="{% url 'profiles:profile_view' slug=profile.slug %}">
+						<img class="card-img-top rounded-circle" 
+						src="{{profile.avatar.url}}" alt="Card image cap"></a>
+				</div>
+				<div class="col-sm-9">
+					<div class="card-body">
+						<a href="{% url 'profiles:profile_view' slug=profile.slug %}">
+					    <h5 class="card-title">{{profile}}</h5></a>
+					    <p class="card-text"></p>
+			    		{% if profile in wating_approval %}
+
+					    <form action="{% url 'profiles:remove_friend' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="list">
+                            <input type="hidden" name="friend_id" value={{profile.pk}}>
+                            <p>Wating for apporaval</p>
+                            <button type="submit" class="btn btn-secondary">Withdraw</button>
+                        </form>
+                        {% else %}
+                        <form action="{% url 'profiles:add_friend' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="list">
+                            <input type="hidden" name="profile_id" value={{profile.pk}}>
+                            <button type="submit" class="btn btn-primary">Add friend</button>
+                        </form>
+                        {% endif %}
+					  </div>
+				</div>
+			</div>
+		</div>
+	{% endfor %}	
+	{% endif %}	
+	{% endif %}	
+	{% endblock body %}
+
+	{% block scripts %}
+	{% endblock scripts %}
