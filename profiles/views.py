@@ -70,7 +70,7 @@ class ProfileView(LoginRequiredMixin,View):
 		return redirect(request.get_full_path())
 
 
-@login_required
+# @login_required
 def signup_view(request):
 	form = UserCreationForm(request.POST or None)
 	if form.is_valid():

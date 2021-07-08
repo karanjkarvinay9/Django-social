@@ -8,4 +8,4 @@ class ProfileModelForm(forms.ModelForm):
 	avatar = forms.ImageField(label='Change Profile Picture' ,widget=forms.FileInput)
 	class Meta:
 		model = Profile
-		fields = ('first_name', 'last_name', 'bio', 'avatar')
+		fields = ('first_name', 'last_name','email', 'bio', 'avatar')
